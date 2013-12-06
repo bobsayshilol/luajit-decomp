@@ -622,6 +622,7 @@ EndFunc
 
 Func fixup()
 	_ArrayDelete($faa,0)
+	
 	for $fi = 0 to UBound($faa)-1
 		_ArrayDelete($faa[$fi],0)
 		_ArrayDelete($faa[$fi],0)
@@ -676,7 +677,8 @@ Func fixup()
 				;_ArrayDelete($faa[$fi],$li)
 				;ContinueLoop
 				
-			ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
+				ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
+				ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
 				$tmp = StringSplit($line,"--",1)
 				$tmp = StringSplit($tmp[2]," ")
 				For $li2 = $li+1 To UBound($func)-1
@@ -879,15 +881,15 @@ Func fixup()
 		WEnd
 		$faa[$fi] = $func
 		
-		$li = 0
-		While $li < UBound($func)-1
-			If StringLeft($func[$li],2) = "--" Then
-				_ArrayDelete($func,$li)
-				ContinueLoop
-			EndIf
-			$li += 1
-		WEnd
-		$faa[$fi] = $func
+;~ 		$li = 0
+;~ 		While $li < UBound($func)-1
+;~ 			If StringLeft($func[$li],2) = "--" Then
+;~ 				_ArrayDelete($func,$li)
+;~ 				ContinueLoop
+;~ 			EndIf
+;~ 			$li += 1
+;~ 		WEnd
+;~ 		$faa[$fi] = $func
 		
 		Dim $indents = 0
 		for $li = 0 to UBound($func)-1
@@ -921,18 +923,8 @@ Func fixup()
 		$faa[$fi] = $func
 	Next
 	
-	For $fi = UBound($faa)-1 to 0 Step -1
-		$func = $faa[$fi]
-		$li = UBound($func)-1
-		While $li > 0
-			If StringLeft($func[$li],20) = "local randomFunction" Then
-				;_ArrayInsert($func,$li,"end")
-				;$func[$li+1] = StringTrimLeft($func[$li+1],4)
-			EndIf
-			$li -= 1
-		WEnd
-		$faa[$fi] = $func
-	Next
+	handleFunc(UBound($faa)-1)
+	
 EndFunc
 
 Func handleIf($li,$le,$func)
@@ -1005,4 +997,21 @@ Func handleIf($li,$le,$func)
 		$li3+=1
 	WEnd
 	Return $func
+EndFunc
+
+Func handleFunc($fi)
+	Dim $func4 = $faa[$fi]
+	Dim $li4 = UBound($func4)-1
+	Dim $noFunc = 0
+	While $li4 >= 0
+		If StringLeft(StringReplace($func4[$li4],"	",""),20) = "local randomFunction" Then
+			$noFunc += handleFunc($fi-$noFunc-1)
+			Dim $func5 = $faa[$fi-$noFunc]
+			$func5[0] = "function randomFunction" & StringLeft($func4[$li4+1],StringInStr($func4[$li4+1]," =")) & StringTrimLeft($func5[0],StringInStr($func5[0],"(")-1)
+			$faa[$fi-$noFunc] = $func5
+			;_ArrayDisplay($faa)
+		EndIf
+		$li4 -= 1
+	WEnd
+	Return $noFunc+1
 EndFunc
