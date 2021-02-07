@@ -117,7 +117,7 @@ Func handleLine($l)
 		If $sec[0]>=5 Then $p3 = $sec[5]
 		;_ArrayDisplay($filo)
 		If _ArraySearch($jmps,$header)<>-1 Then
-			FileWriteLine($out,"--location " & $header)
+			FileWriteLine($out,"--location " & $header & "--" & $header & " LOCATION-LOCATION")
 			_ArrayDelete($jmps,_ArraySearch($jmps,$header))
 		EndIf
 		If _ArraySearch($loops,$header)<>-1 Then
@@ -540,7 +540,7 @@ Func handleOp($f,$p1,$p2,$p3,$c,$h,$c2)
 			FileWriteLine($out,"for var_" & $fNo & "_" & $p1 & ", var_" & $fNo & "_" & $p1+1 & " in (" & $filo[$p1-3] & " calling function) do --" & $filo[$p1-3] & " FORTEST-FORTEST")
 		EndIf
 		;FileWriteLine($out,"--it could be an else of an elseif")
-		FileWriteLine($out,"--jump to " & $p2 & " (if previous if statement is false)")
+		FileWriteLine($out,"--jump to " & $p2 & " (if previous if statement is false) --" & $p2 & " JMP-JMP")
 		_ArrayAdd($jmps,$p2)
 		$filo[$p1] = "var_" & $fNo & "_" & $p1
 		$filo[$p1+1] = "var_" & $fNo & "_" & $p1+1
@@ -587,7 +587,7 @@ Func handleOp($f,$p1,$p2,$p3,$c,$h,$c2)
 	ElseIf $f = "ITERN" Then
 	ElseIf $f = "ISNEXT" Then
 		If $p1>=3 Then
-			FileWriteLine($out,"for var_" & $fNo & "_" & $p1 & ", var_" & $fNo & "_" & $p1+1 & " in (" & $filo[$p1-3] & "s calling function) do --" & $filo[$p1-3] & " FORTEST-FORTEST")
+			FileWriteLine($out,"for var_" & $fNo & "_" & $p1 & ", var_" & $fNo & "_" & $p1+1 & " in (" & $filo[$p1-3] & " calling function) do --" & $filo[$p1-3] & " FORTEST-FORTEST")
 		EndIf
 		$filo[$p1] = "var_" & $fNo & "_" & $p1
 		$filo[$p1+1] = "var_" & $fNo & "_" & $p1+1
@@ -622,10 +622,12 @@ EndFunc
 
 Func fixup()
 	_ArrayDelete($faa,0)
+	
 	for $fi = 0 to UBound($faa)-1
 		_ArrayDelete($faa[$fi],0)
 		_ArrayDelete($faa[$fi],0)
 		$li = 0
+		Dim $jmps3[1]
 		While $li < UBound($faa[$fi])-1
 			;MsgBox(0,"",$li)
 			$func = $faa[$fi]
@@ -635,10 +637,17 @@ Func fixup()
 			If StringRight($line,15) = "FORTEST-FORTEST" Then
 				$tmp = StringSplit($line,"--",1)
 				$tmp = StringSplit($tmp[2]," ")
-				If Not StringInStr($func[$li-1],$tmp[1]) Then
+				If Not (StringInStr($func[$li-1],$tmp[1]) and StringInStr($func[$li-1]," = ")) Then
 					_ArrayDelete($faa[$fi],$li)
 					ContinueLoop
 				EndIf
+				
+				$line = StringSplit($func[$li-1]," = ",1)
+				;_ArrayDisplay($line)
+				$func[$li] = StringReplace($func[$li],"(" & $tmp[1] & " calling function)",$line[2])
+				_ArrayDelete($func,$li-1)
+				$faa[$fi] = $func
+				ContinueLoop
 				
 			ElseIf StringRight($line,13) = "STRING-STRING" Then
 				$tmp = StringSplit($line,"--",1)
@@ -668,7 +677,8 @@ Func fixup()
 				;_ArrayDelete($faa[$fi],$li)
 				;ContinueLoop
 				
-			ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
+				ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
+				ElseIf StringRight($line,13) = "NUMBER-NUMBER" Then
 				$tmp = StringSplit($line,"--",1)
 				$tmp = StringSplit($tmp[2]," ")
 				For $li2 = $li+1 To UBound($func)-1
@@ -729,6 +739,7 @@ Func fixup()
 				;ContinueLoop
 				
 			ElseIf StringRight($line,19) = "PRIMITIVE-PRIMITIVE" Then
+			ElseIf StringRight($line,19) = "PRIMITIVE-PRIMITIVE" Then
 				$tmp = StringSplit($line,"--",1)
 				$tmp = StringSplit($tmp[2]," ")
 				For $li2 = $li+1 To UBound($func)-1
@@ -758,13 +769,55 @@ Func fixup()
 				;_ArrayDelete($faa[$fi],$li)
 				;ContinueLoop
 				
+;~ 			ElseIf StringRight($line,7) = "JMP-JMP" Then
+;~ 				$tmp = StringSplit($line,"--",1)
+;~ 				$tmp = StringSplit($tmp[3]," ")
+;~ 				;_ArrayDisplay($tmp)
+;~ 				$func = handleIf($li,$func,$tmp)
+;~ 				;_ArrayDisplay($func)
+;~ 				$faa[$fi] = $func
+				
+;~ 				For $li2 = $li+1 To UBound($func)-1
+;~ 					If StringRight($func[$li2],22) = $tmp[1] & " LOCATION-LOCATION" Then
+;~ 						If StringRight($func[$li2-1],8) = " JMP-JMP" Then						;else statement
+;~ 							$tmp = StringSplit($func[$li2-1],"--",1)
+;~ 							$tmp = StringSplit($tmp[3]," ")
+;~ 							MsgBox(0,"","else" & @CRLF & $tmp[3])
+;~ 							If StringLeft($func[$li2],11) = "--location " Then
+;~ 								$func[$li2] = "else --" & $tmp[1] & " LOCATION-LOCATION"
+;~ 							Else
+;~ 								$li+=1
+;~ 								ContinueLoop 2
+;~ 							EndIf
+;~ 						Else																	;no else statement
+;~ 							MsgBox(0,"","standard")
+;~ 							If StringLeft($func[$li2],11) = "--location " Then
+;~ 								$func[$li2] = "end --" & $tmp[1] & " LOCATION-LOCATION"
+;~ 							Else
+;~ 								$li+=1
+;~ 								ContinueLoop 2
+;~ 							EndIf
+;~ 						EndIf
+;~ 						;Exit
+;~ 						;$line = StringSplit($line,"=")
+;~ 						;$line = StringSplit($line[2],"--",1)
+;~ 						;$func[$li2] = StringReplace($func[$li2],$tmp[1],$line[1])
+;~ 						;$faa[$fi] = $func
+;~ 						;_ArrayDelete($faa[$fi],$li)
+;~ 						;ContinueLoop 2
+;~ 						;ExitLoop
+;~ 					EndIf
+;~ 				Next
+				;_ArrayDelete($faa[$fi],$li)
+				;ContinueLoop
+				
 			EndIf
 			$li = $li + 1
 		WEnd
 		
 		Dim $maxInVar = -1
 		$func = $faa[$fi]
-		for $li = 0 to UBound($faa[$fi])-1
+		for $li = 0 to UBound($func)-1
 			If StringInStr($func[$li],"INPUT_VAR_") Then
 				$tmp = StringSplit($func[$li],"INPUT_VAR_",1)
 				$tmp = StringSplit($tmp[2],"_")
@@ -778,7 +831,7 @@ Func fixup()
 		$faa[$fi] = $func
 		
 		Dim $varList[1]
-		for $li = 0 to UBound($faa[$fi])-1
+		While $li < UBound($func)-1
 			If StringLeft($func[$li],4) = "var_" Then
 				$tmp = StringSplit($func[$li]," ")
 				$tmp = StringSplit($tmp[1],".")
@@ -787,8 +840,178 @@ Func fixup()
 					$func[$li] = "local " & $func[$li]
 				EndIf
 			EndIf
+			$li+=1
+		WEnd
+		$faa[$fi] = $func
+		
+		$func = handleIf(0,UBound($func),$func)
+		$faa[$fi] = $func
+		
+		$li = 0
+		While $li < UBound($func)-1
+			If StringRight($func[$li],12) = "--REVERSE ME" Then
+				$tmp = StringTrimRight($func[$li],12)
+				While StringRight($tmp,12) = "--REVERSE ME"
+					$tmp = StringTrimRight($tmp,12)
+				WEnd
+				While StringLeft($tmp,4) = "end "
+					$tmp = StringTrimLeft($tmp,4)
+				WEnd
+				If $tmp = "else" Then
+					_ArrayInsert($func,$li+1,$tmp)
+					$tmp = StringSplit($func[$li],$tmp,1)
+					$func[$li] = $tmp[1]
+				Else
+					_ArrayInsert($func,$li,$tmp)
+					$tmp = StringSplit($func[$li+1],$tmp,1)
+					$func[$li+1] = $tmp[1]
+				EndIf
+			EndIf
+			$li += 1
+		WEnd
+		$faa[$fi] = $func
+		
+		$li = 0
+		While $li < UBound($func)-1
+			If StringLeft($func[$li],5) = "end e" Then
+				_ArrayInsert($func,$li,"end")
+				$func[$li+1] = StringTrimLeft($func[$li+1],4)
+			EndIf
+			$li += 1
+		WEnd
+		$faa[$fi] = $func
+		
+;~ 		$li = 0
+;~ 		While $li < UBound($func)-1
+;~ 			If StringLeft($func[$li],2) = "--" Then
+;~ 				_ArrayDelete($func,$li)
+;~ 				ContinueLoop
+;~ 			EndIf
+;~ 			$li += 1
+;~ 		WEnd
+;~ 		$faa[$fi] = $func
+		
+		Dim $indents = 0
+		for $li = 0 to UBound($func)-1
+			$tmp = $func[$li]
+			If $tmp = "end" Then
+				$indents -= 1
+			ElseIf StringLeft($tmp,4) = "end " Then
+				$indents -= 1
+			ElseIf $tmp = "else" Then
+				$indents -= 1
+			ElseIf StringLeft($tmp,5) = "else " Then
+				$indents -= 1
+			EndIf
+			
+			For $indentno = 1 to $indents
+				$func[$li] = "	" & $func[$li]
+			Next
+			
+			If StringLeft($tmp,3) = "if " Then
+				$indents += 1
+			ElseIf StringLeft($tmp,9) = "function " Then
+				$indents += 1
+			ElseIf $tmp = "else" Then
+				$indents += 1
+			ElseIf StringLeft($tmp,5) = "else " Then
+				$indents += 1
+			ElseIf StringLeft($tmp,4) = "for " Then
+				$indents += 1
+			EndIf
 		Next
 		$faa[$fi] = $func
 	Next
+	
+	handleFunc(UBound($faa)-1)
+	
 EndFunc
 
+Func handleIf($li,$le,$func)
+	Dim $li3 = $li+1
+	While $li3 < $le-1
+		;MsgBox(0,"",$func[$li2])
+		;if StringRight($line,7) = "JMP-JMP" Then
+		;_ArrayDisplay($func,$li3)
+		if StringLeft($func[$li3],3) = "if " Then
+			Dim $mid = 0
+			Dim $end = 0
+			$tmp = StringSplit($func[$li3+1],"--",1)
+			If UBound($tmp) <> 4 Then
+				;$func[$li3] = "///////////////////////////" & $func[$li3] & " --SOME ERROR HAPPENED HERE///////////////////////////////////////////////"
+				_ArrayInsert($func,$li3+1,"end -- maybe?")
+				$li3+=2
+				ContinueLoop
+			EndIf
+			;_ArrayDisplay($tmp)
+			$tmp = StringSplit($tmp[3]," ")
+			;_ArrayDisplay($tmp)
+			;ContinueLoop
+			For $li2 = $li3+1 To $le-1
+				If StringRight($func[$li2],22) = $tmp[1] & " LOCATION-LOCATION" Then
+					If StringRight($func[$li2-1],8) = " JMP-JMP" Then						;else statement
+						;MsgBox(0,"","")
+						Dim $tmp2 = StringSplit($func[$li2-1],"--",1)
+						$tmp2 = StringSplit($tmp2[3]," ")
+						;_ArrayDisplay($tmp2)
+						If $tmp[1] <> $tmp2[1] Then
+							$func[$li2-1] = "else"; --" & $tmp[1] ;& " LOCATION-LOCATION"
+							$tmp = $tmp2
+							;$func = handleIf($li2,$func)
+							;_ArrayInsert($func,$li2-1,"end --?")
+							;_ArrayDelete($func,$li2-1)
+							$mid = $li2
+						Else																;no else statement
+							$func[$li2] = "end"; --" & $tmp[1] ;& " LOCATION-LOCATION"
+							$end = $li2
+						EndIf
+						$func[$li2] = $func[$li2] & "_"
+					Else																	;no else statement
+						$func[$li2] = "end"; --" & $tmp[1] ;& " LOCATION-LOCATION"
+						$end = $li2
+					EndIf
+				EndIf
+			Next
+			If $mid = 0 Then
+				If $end = 0 Then
+					$func = handleIf($li3,$le,$func)
+					$func[$le-1] = "end " & $func[$le-1] & "--REVERSE ME"
+					$li3 = $le-1
+				Else
+					$func = handleIf($li3,$end,$func)
+					$li3 = $end-1
+				EndIf
+			Else
+				If $end = 0 Then
+					$func = handleIf($li3,$mid,$func)
+					$func = handleIf($mid,$le,$func)
+					$func[$le-1] = "end " & $func[$le-1] & "--REVERSE ME"
+					$li3 = $le-1
+				Else
+					$func = handleIf($li3,$mid,$func)
+					$func = handleIf($mid,$end,$func)
+					$li3 = $end-1
+				EndIf
+			EndIf
+		EndIf
+		$li3+=1
+	WEnd
+	Return $func
+EndFunc
+
+Func handleFunc($fi)
+	Dim $func4 = $faa[$fi]
+	Dim $li4 = UBound($func4)-1
+	Dim $noFunc = 0
+	While $li4 >= 0
+		If StringLeft(StringReplace($func4[$li4],"	",""),20) = "local randomFunction" Then
+			$noFunc += handleFunc($fi-$noFunc-1)
+			Dim $func5 = $faa[$fi-$noFunc]
+			$func5[0] = "function randomFunction" & StringLeft($func4[$li4+1],StringInStr($func4[$li4+1]," =")) & StringTrimLeft($func5[0],StringInStr($func5[0],"(")-1)
+			$faa[$fi-$noFunc] = $func5
+			;_ArrayDisplay($faa)
+		EndIf
+		$li4 -= 1
+	WEnd
+	Return $noFunc+1
+EndFunc
