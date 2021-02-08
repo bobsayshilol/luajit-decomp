@@ -99,6 +99,13 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		local u = args[2]
 		reg[o] = "TODO_UGET_" .. u
 
+	elseif op == "USETV" then
+		assert(#args == 2)
+		local i = args[1]
+		local v = assert(reg[args[2]])
+		reg[i] = "TODO_UGET_" .. i
+		self:Write(reg[i] .. " = " .. v)
+
 
 	elseif op == "CALL" then
 		assert(#args == 3)
@@ -116,6 +123,10 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		line = line .. ")"
 
 		self:Write(line)
+
+	elseif op == "UCLO" then
+		assert(#args == 2)
+		assert(args[1] == 0)
 
 	elseif op == "RET0" then
 		assert(#args == 2)
