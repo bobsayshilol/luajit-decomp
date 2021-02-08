@@ -219,6 +219,12 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		reg[o] = f
 		self:Write("local " .. f .. " = function() end -- new function, value unknown")
 
+	elseif op == "TNEW" then
+		assert(#args == 2)
+		assert(args[2] == 0)
+		local o = args[1]
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = {}")
 
 	elseif op == "KPRI" then
 		assert(#args == 2)
@@ -259,6 +265,14 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		op == "DIVVV" or op == "DIVVN" or op == "DIVNV" or
 		op == "MODVV" or op == "MODVN" or op == "MODNV" then
 		self:HandleMaths(op, args, reg)
+
+	elseif op == "POW" then
+		assert(#args == 3)
+		local o = args[1]
+		local a = assert(reg[args[2]])
+		local b = assert(reg[args[3]])
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = " .. a .. " ^ " .. b)
 
 
 	elseif op == "JMP" then

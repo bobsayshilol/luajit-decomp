@@ -11,8 +11,8 @@ end
 function func_15(...)
 local TODO_GLOBAL_0 = function() end -- new function, value unknown
 test = TODO_GLOBAL_0
--- Unhandled: TNEW
-local_var_2 = TODO_GLOBAL_0
+local_var_0 = {}
+local_var_2 = local_var_0
 test(local_var_2)
 return
 end
