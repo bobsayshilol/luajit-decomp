@@ -7,9 +7,9 @@ Here's a thing I done made that re-assembles LuaJIT from it's assembly-bytecode 
 
 This repo is currently in a state of flux.
 
-For the old .exe's take a look at the [deprecated branch](/bobsayshilol/luajit-decomp/tree/deprecated).
+For the old .exe's take a look at the [deprecated branch](https://github.com/bobsayshilol/luajit-decomp/tree/deprecated).
 
-For new code that's readable (but may never be completed) take a look at the [reimplementation branch](/bobsayshilol/luajit-decomp/tree/reimplementation).
+For new code that's readable (but may never be completed) take a look at the [reimplementation branch](https://github.com/bobsayshilol/luajit-decomp/tree/reimplementation).
 
 
 ### If you have any questions on how to use it then read the wiki ###
