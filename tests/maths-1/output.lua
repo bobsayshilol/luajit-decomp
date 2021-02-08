@@ -50,7 +50,7 @@ local_var_1 = 1
 TODO_GLOBAL_0.x = local_var_1
 local_var_1 = 2
 TODO_GLOBAL_0.y = local_var_1
--- Unhandled: KPRI
+local_var_1 = false
 TODO_GLOBAL_0.z = local_var_1
 local_var_2 = TODO_GLOBAL_0
 test(local_var_2)

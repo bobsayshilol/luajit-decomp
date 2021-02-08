@@ -10,6 +10,8 @@ function test(a)
 
 	if b then
 		b = a > 20
+	else
+		b = nil
 	end
 end
 

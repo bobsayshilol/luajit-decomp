@@ -143,6 +143,16 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		self:Write("local " .. f .. " = function() end -- new function, value unknown")
 
 
+	elseif op == "KPRI" then
+		assert(#args == 2)
+		local prims = { "nil", "false", "true" }
+		local o = args[1]
+		local t = args[2]
+		assert(t >= 0)
+		assert(t < 3)
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = " .. prims[t + 1])
+
 	elseif op == "KSHORT" then
 		assert(#args == 2)
 		local o = args[1]
