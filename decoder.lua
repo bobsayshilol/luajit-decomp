@@ -170,20 +170,30 @@ function Disassembler:HandleOp(pc, op, args, comment)
 
 	elseif op == "CALL" then
 		assert(#args == 3)
-		assert(args[2] == 1)
 
 		local start = args[1]
-		local count = args[3]
-		local name = assert(reg[start])
+		local outputs = args[2]
+		local inputs = args[3]
 
 		-- Build up the function call: {"a", "b", "c"} -> a(b, c)
-		local line = name .. "("
-		if count > 1 then
-			line = line .. table.concat(reg, ", ", start + 1, start + count - 1)
-		end
-		line = line .. ")"
+		local name = assert(reg[start])
+		local params = "(" .. table.concat(reg, ", ", start + 1, start + inputs - 1) .. ")"
 
-		self:Write(line)
+		-- And the return values too
+		assert(outputs >= 1)
+		local outs = ""
+		if outputs > 1 then
+			-- Similar to the inputs, they're assigned back to start + i for each handled return value
+			for output = 2, outputs do
+				local r = start + output - 2
+				reg[r] = "local_var_" .. r
+				outs = outs .. reg[r] .. ", "
+			end
+			-- Trim the last comma
+			outs = outs:sub(1, -3) .. " = "
+		end
+
+		self:Write(outs .. name .. params)
 
 	elseif op == "UCLO" then
 		assert(#args == 2)
@@ -194,6 +204,12 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		assert(args[1] == 0)
 		assert(args[2] == 1)
 		self:Write("return")
+
+	elseif op == "RET1" then
+		assert(#args == 2)
+		local o = assert(reg[args[1]])
+		assert(args[2] == 2)
+		self:Write("return " .. o)
 
 
 	elseif op == "FNEW" then
