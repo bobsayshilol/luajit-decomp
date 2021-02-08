@@ -1,9 +1,9 @@
 function func_1(...)
--- Unhandled: MULVN
+local_var_1 = input_var_0 * TODO_NUMBER
 -- Unhandled: ISGE
 -- Unhandled: JMP
 local_var_0 = 10
--- Unhandled: MULVN
+local_var_1 = local_var_0 * TODO_NUMBER
 -- Unhandled: ISGE
 -- Unhandled: JMP
 local_var_0 = 10

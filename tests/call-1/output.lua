@@ -5,7 +5,7 @@ end
 function func_4(...)
 local_var_2 = input_var_0
 tester(local_var_2)
--- Unhandled: ADDVV
+local_var_2 = input_var_0 + input_var_0
 tester(local_var_2)
 local_var_2 = input_var_0
 local_var_3 = input_var_0

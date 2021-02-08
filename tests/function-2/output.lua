@@ -1,7 +1,7 @@
 function func_1(...)
--- Unhandled: ADDVN
+local_var_0 = TODO_UGET_0 + TODO_NUMBER
 -- Unhandled: USETV
--- Unhandled: MULVN
+local_var_0 = TODO_UGET_0 * TODO_NUMBER
 -- Unhandled: USETV
 return
 end

@@ -3,8 +3,8 @@ local_var_1 = 100
 -- Unhandled: ISGE
 -- Unhandled: JMP
 -- Unhandled: LOOP
--- Unhandled: MULNV
--- Unhandled: ADDVN
+local_var_1 = TODO_NUMBER * input_var_0
+local_var_0 = local_var_1 + TODO_NUMBER
 -- Unhandled: JMP
 return
 end

@@ -18,6 +18,48 @@ function Disassembler:new(fileOut)
 end
 
 
+function Disassembler:HandleMaths(op, args, reg)
+	assert(#args == 3)
+	local o = args[1]
+	local a = args[2]
+	local b = args[3]
+
+	-- Grab the type
+	local strOp
+	if op:sub(1, 3) == "ADD" then
+		strOp = " + "
+	elseif op:sub(1, 3) == "SUB" then
+		strOp = " - "
+	elseif op:sub(1, 3) == "MUL" then
+		strOp = " * "
+	elseif op:sub(1, 3) == "DIV" then
+		strOp = " / "
+	elseif op:sub(1, 3) == "MOD" then
+		strOp = " % "
+	else
+		self:Log("Unknown operation: " .. op)
+		return
+	end
+
+	-- Use raw numbers if required
+	local pick = function(v, t)
+		if t == 'V' then
+			return assert(reg[v])
+		elseif t == 'N' then
+			return "TODO_NUMBER"
+		else
+			self:Log("Unknown operation: " .. op)
+			return "INVALID"
+		end
+	end
+	a = pick(a, op:sub(4, 4))
+	b = pick(b, op:sub(5, 5))
+
+	reg[o] = "local_var_" .. o
+	self:Write(reg[o] .. " = " .. a .. strOp .. b)
+end
+
+
 function Disassembler:HandleOp(pc, op, args, comment)
 	-- Cache commonly accessed variables
 	local reg = assert(self.registers)
@@ -104,6 +146,22 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		local i = assert(reg[args[2]])
 		reg[o] = "local_var_" .. o
 		self:Write(reg[o] .. " = " .. i)
+
+	elseif op == "NOT" then
+		assert(#args == 2)
+		local o = args[1]
+		local i = assert(reg[args[2]])
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = not " .. i)
+
+	elseif
+		op == "ADDVV" or op == "ADDVN" or op == "ADDNV" or
+		op == "SUBVV" or op == "SUBVN" or op == "SUBNV" or
+		op == "MULVV" or op == "MULVN" or op == "MULNV" or
+		op == "DIVVV" or op == "DIVVN" or op == "DIVNV" or
+		op == "MODVV" or op == "MODVN" or op == "MODNV" then
+		self:HandleMaths(op, args, reg)
+
 
 	else
 		self:Log("Unhandled operation: " .. op)

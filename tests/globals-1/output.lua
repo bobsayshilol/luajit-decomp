@@ -1,6 +1,6 @@
 function func_1(...)
--- Unhandled: ADDVN
-a = a
+local_var_0 = a + TODO_NUMBER
+a = local_var_0
 return
 end
 
