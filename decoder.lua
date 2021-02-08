@@ -73,8 +73,8 @@ function Disassembler:HandleOp(pc, op, args, comment)
 
 	elseif op == "GSET" then
 		assert(#args == 2)
-		local i = assert(func.globals[args[2]])
-		local v = assert(reg[args[1]])
+		local i = assert(reg[args[1]])
+		local v = assert(func.globals[args[2]])
 		self:Write(v .. " = " .. i)
 
 
@@ -129,7 +129,7 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		local o = args[1]
 		local f = assert(func.globals[args[2]])
 		reg[o] = f
-		self:Write("local " .. f .. " = function() end -- new function, value assigned later")
+		self:Write("local " .. f .. " = function() end -- new function, value unknown")
 
 
 	elseif op == "KSHORT" then

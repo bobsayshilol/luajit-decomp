@@ -14,10 +14,10 @@ end
 
 function func_19(...)
 local_var_0 = 0
-local TODO_GLOBAL_0 = function() end -- new function, value assigned later
-TODO_GLOBAL_0 = inner
-local TODO_GLOBAL_2 = function() end -- new function, value assigned later
-TODO_GLOBAL_2 = outer
+local TODO_GLOBAL_0 = function() end -- new function, value unknown
+inner = TODO_GLOBAL_0
+local TODO_GLOBAL_2 = function() end -- new function, value unknown
+outer = TODO_GLOBAL_2
 outer()
 -- Unhandled: UCLO
 return

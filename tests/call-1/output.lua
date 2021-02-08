@@ -15,10 +15,10 @@ return
 end
 
 function func_19(...)
-local TODO_GLOBAL_0 = function() end -- new function, value assigned later
-TODO_GLOBAL_0 = tester
-local TODO_GLOBAL_2 = function() end -- new function, value assigned later
-TODO_GLOBAL_2 = test
+local TODO_GLOBAL_0 = function() end -- new function, value unknown
+tester = TODO_GLOBAL_0
+local TODO_GLOBAL_2 = function() end -- new function, value unknown
+test = TODO_GLOBAL_2
 local_var_1 = 1
 test(local_var_1)
 return

@@ -15,13 +15,13 @@ local_var_1 = 20
 -- Unhandled: KPRI
 -- Unhandled: JMP
 -- Unhandled: KPRI
-local_var_1 = b
+b = local_var_1
 return
 end
 
 function func_23(...)
-local TODO_GLOBAL_0 = function() end -- new function, value assigned later
-TODO_GLOBAL_0 = test
+local TODO_GLOBAL_0 = function() end -- new function, value unknown
+test = TODO_GLOBAL_0
 local_var_1 = 100
 test(local_var_1)
 return

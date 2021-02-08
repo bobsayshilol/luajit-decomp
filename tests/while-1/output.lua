@@ -10,8 +10,8 @@ return
 end
 
 function func_12(...)
-local TODO_GLOBAL_0 = function() end -- new function, value assigned later
-TODO_GLOBAL_0 = test
+local TODO_GLOBAL_0 = function() end -- new function, value unknown
+test = TODO_GLOBAL_0
 local_var_1 = 1
 test(local_var_1)
 local_var_1 = 2
