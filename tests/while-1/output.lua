@@ -1,11 +1,11 @@
 function func_1(...)
 local_var_1 = 100
--- Unhandled: ISGE
--- Unhandled: JMP
+local_cmp_result = input_var_0 >= local_var_1
+if local_cmp_result then goto #8 end -- 1
 -- Unhandled: LOOP
 local_var_1 = TODO_NUMBER * input_var_0
 local_var_0 = local_var_1 + TODO_NUMBER
--- Unhandled: JMP
+if local_cmp_result then goto #1 end -- 1
 return
 end
 

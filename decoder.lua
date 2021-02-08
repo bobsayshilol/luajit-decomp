@@ -60,6 +60,67 @@ function Disassembler:HandleMaths(op, args, reg)
 end
 
 
+function Disassembler:HandleIf(op, args, reg, func)
+	assert(#args >= 1)
+	local a = assert(reg[args[1]])
+
+	-- Build the condition
+	local condition
+	if op:sub(3) == "T" then
+		assert(#args == 1)
+		condition = a
+	elseif op:sub(3) == "F" then
+		assert(#args == 1)
+		condition = "not " .. a
+
+	else
+		-- Determine the type of operation
+		local strOp
+		if op:sub(3) == "GE" then
+			strOp = " >= "
+		elseif op:sub(3) == "GT" then
+			strOp = " > "
+		elseif op:sub(3) == "LE" then
+			strOp = " <= "
+		elseif op:sub(3) == "LT" then
+			strOp = " < "
+		elseif op:sub(3, 4) == "NE" then
+			strOp = " ~= "
+		elseif op:sub(3, 4) == "EQ" then
+			strOp = " == "
+		else
+			self:Log("Unknown operation: " .. op)
+			return
+		end
+
+		-- Handle the 2nd arg
+		assert(#args == 2)
+		local b = args[2]
+		if op:sub(3, 3) == "G" or op:sub(3, 3) == "L" then
+			b = assert(reg[b])
+		elseif op:sub(5) == "N" then
+			b = "TODO_NUMBER"
+		elseif op:sub(5) == "P" then
+			local prims = { "nil", "false", "true" }
+			assert(b >= 0)
+			assert(b < 3)
+			b = prims[b + 1]
+		elseif op:sub(5) == "S" then
+			b = '"' .. assert(func.globals[b]) .. '"'
+		elseif op:sub(5) == "V" then
+			b = assert(reg[b])
+		else
+			self:Log("Unknown operation: " .. op)
+			return
+		end
+
+		condition = a .. strOp .. b
+	end
+
+	self:Write("local_cmp_result = " .. condition)
+end
+
+
 function Disassembler:HandleOp(pc, op, args, comment)
 	-- Cache commonly accessed variables
 	local reg = assert(self.registers)
@@ -182,6 +243,16 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		op == "DIVVV" or op == "DIVVN" or op == "DIVNV" or
 		op == "MODVV" or op == "MODVN" or op == "MODNV" then
 		self:HandleMaths(op, args, reg)
+
+
+	elseif op == "JMP" then
+		assert(#args == 2)
+		local i = args[1]
+		local dest = args[2]
+		self:Write("if local_cmp_result then goto #" .. dest .. " end -- " .. i)
+
+	elseif op:sub(1, 2) == "IS" then
+		self:HandleIf(op, args, reg, func)
 
 
 	else
