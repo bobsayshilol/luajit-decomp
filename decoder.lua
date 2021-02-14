@@ -243,6 +243,13 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		reg[o] = "local_var_" .. o
 		self:Write(reg[o] .. " = " .. i)
 
+	elseif op == "KSTR" then
+		assert(#args == 2)
+		local o = args[1]
+		local s = assert(func.globals[args[2]])
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = \"" .. s .. "\"")
+
 
 	elseif op == "MOV" then
 		assert(#args == 2)
@@ -283,6 +290,16 @@ function Disassembler:HandleOp(pc, op, args, comment)
 
 	elseif op:sub(1, 2) == "IS" then
 		self:HandleIf(op, args, reg, func)
+
+
+	elseif op == "CAT" then
+		assert(#args == 3)
+		local o = args[1]
+		local first = args[2]
+		local last = args[3]
+		-- TODO: what if reg[o] is used in the concat?
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = " .. table.concat(reg, " .. ", first, last))
 
 
 	else
