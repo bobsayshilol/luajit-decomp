@@ -1,11 +1,13 @@
 function func_1(...)
+::label_1::
 local_var_1 = 100
 local_cmp_result = input_var_0 >= local_var_1
-if local_cmp_result then goto #8 end -- 1
 -- Unhandled: LOOP
+if local_cmp_result then goto label_8 end -- 1
 local_var_1 = TODO_NUMBER * input_var_0
 local_var_0 = local_var_1 + TODO_NUMBER
-if local_cmp_result then goto #1 end -- 1
+if local_cmp_result then goto label_1 end -- 1
+::label_8::
 return
 end
 

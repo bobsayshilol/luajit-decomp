@@ -20,6 +20,7 @@ inner = TODO_GLOBAL_0
 local TODO_GLOBAL_2 = function() end -- new function, value unknown
 outer = TODO_GLOBAL_2
 outer()
+::label_10::
 return
 end
 

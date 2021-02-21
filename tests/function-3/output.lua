@@ -11,6 +11,7 @@ end
 function func_11(...)
 local_var_0 = 0
 local TODO_GLOBAL_0 = function() end -- new function, value unknown
+::label_4::
 return TODO_GLOBAL_0
 end
 

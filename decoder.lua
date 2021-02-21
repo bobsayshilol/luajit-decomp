@@ -121,10 +121,14 @@ function Disassembler:HandleIf(op, args, reg, func)
 end
 
 
-function Disassembler:HandleOp(pc, op, args, comment)
+function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 	-- Cache commonly accessed variables
 	local reg = assert(self.registers)
 	local func = assert(self.currentFunction)
+
+	if isJumpDest then
+		self:Write("::label_" .. pc .. "::")
+	end
 
 	if op == "GGET" then
 		assert(#args == 2)
@@ -286,7 +290,7 @@ function Disassembler:HandleOp(pc, op, args, comment)
 		assert(#args == 2)
 		local i = args[1]
 		local dest = args[2]
-		self:Write("if local_cmp_result then goto #" .. dest .. " end -- " .. i)
+		self:Write("if local_cmp_result then goto label_" .. dest .. " end -- " .. i)
 
 	elseif op:sub(1, 2) == "IS" then
 		self:HandleIf(op, args, reg, func)
@@ -315,7 +319,6 @@ function Disassembler:HandleInstruction(line)
 	assert(self.currentFunction ~= nil)
 
 	-- Split the line into parts we can use
-	line = line:gsub("=>", "") -- Remove =>'s
 	line = line:gsub(" +", " ") -- Remove whitespace
 
 	-- Strip off any comments, but keep them around since they can hold useful info
@@ -343,14 +346,19 @@ function Disassembler:HandleInstruction(line)
 		self:Info("New global (" .. idx .. "): " .. line)
 		return
 
-	elseif not pc:find("%d%d%d%d") then
+	elseif pc:find("%d%d%d%d") then
+		pc = tonumber(pc)
+		line = line:sub(6)
+
+	else
 		self:Log("Unknown instruction format: " .. line)
 		return
 
-	else
-		line = line:sub(6)
-
 	end
+
+	-- Check for any jump info
+	local isJumpDest = line:sub(1, 3) == "=> "
+	line = line:gsub("=> ", "") -- This also removes it from the jumps
 
 	-- Pull out the operation
 	local opIdx = assert(line:find(" "))
@@ -367,7 +375,7 @@ function Disassembler:HandleInstruction(line)
 
 	-- Dispatch this operation
 	self:IncreaseIndent()
-	self:HandleOp(pc, op, args, comment)
+	self:HandleOp(pc, op, args, comment, isJumpDest)
 	self:DecreaseIndent()
 end
 
