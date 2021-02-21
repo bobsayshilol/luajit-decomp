@@ -295,6 +295,11 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 	elseif op:sub(1, 2) == "IS" then
 		self:HandleIf(op, args, reg, func)
 
+	elseif op == "LOOP" then
+		assert(#args == 2)
+		assert(args[1] == 1)
+		self:Write("-- loop start")
+
 
 	elseif op == "CAT" then
 		assert(#args == 3)
