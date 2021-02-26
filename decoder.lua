@@ -158,6 +158,21 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		self:Write(v .. "." .. m .. " = " .. i)
 
 
+	elseif op == "TGETB" then
+		assert(#args == 3)
+		local o = args[1]
+		local v = assert(reg[args[2]])
+		local n = args[3]
+		reg[o] = v .. "[" .. n .. "]"
+
+	elseif op == "TSETB" then
+		assert(#args == 3)
+		local i = assert(reg[args[1]])
+		local v = assert(reg[args[2]])
+		local n = args[3]
+		self:Write(v .. "[" .. n .. "] = " .. i)
+
+
 	elseif op == "UGET" then
 		assert(#args == 2)
 		local o = args[1]
@@ -184,7 +199,6 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		local params = "(" .. table.concat(reg, ", ", start + 1, start + inputs - 1) .. ")"
 
 		-- And the return values too
-		assert(outputs >= 1)
 		local outs = ""
 		if outputs > 1 then
 			-- Similar to the inputs, they're assigned back to start + i for each handled return value
@@ -309,6 +323,14 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		-- TODO: what if reg[o] is used in the concat?
 		reg[o] = "local_var_" .. o
 		self:Write(reg[o] .. " = " .. table.concat(reg, " .. ", first, last))
+
+
+	elseif op == "LEN" then
+		assert(#args == 2)
+		local o = args[1]
+		local i = assert(reg[args[2]])
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = #" .. i)
 
 
 	else
