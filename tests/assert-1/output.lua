@@ -19,8 +19,8 @@ local_var_2 = f(input_var_1[1], input_var_1[2])
 input_var_1[3] = local_var_2
 if local_cmp_result then goto label_26 end -- 2
 ::label_22::
-f()
--- Unhandled: CALLMT
+local_all_outputs = f()
+assert(local_all_outputs)
 ::label_26::
 return
 end

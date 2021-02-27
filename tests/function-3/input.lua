@@ -10,4 +10,7 @@ function create()
 end
 
 local gen = create()
+sink(gen())
 sink(gen(), gen(), gen() + gen())
+sink(sink(gen()))
+sink(sink(gen()), gen())

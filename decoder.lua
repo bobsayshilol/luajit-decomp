@@ -200,7 +200,9 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 
 		-- And the return values too
 		local outs = ""
-		if outputs > 1 then
+		if outputs == 0 then
+			outs = "local_all_outputs = "
+		elseif outputs > 1 then
 			-- Similar to the inputs, they're assigned back to start + i for each handled return value
 			for output = 2, outputs do
 				local r = start + output - 2
@@ -212,6 +214,17 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		end
 
 		self:Write(outs .. name .. params)
+
+	elseif op == "CALLM" then
+		assert(#args == 3)
+		local func = assert(func.globals[args[1]])
+		self:Write(func .. "(local_all_outputs) -- TODO " .. args[2] .. " " .. args[3])
+
+	elseif op == "CALLMT" then
+		assert(#args == 2)
+		assert(args[1] == 2)
+		local func = assert(func.globals[args[2]])
+		self:Write(func .. "(local_all_outputs)")
 
 	elseif op == "UCLO" then
 		assert(#args == 2)
