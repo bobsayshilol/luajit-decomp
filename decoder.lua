@@ -18,7 +18,7 @@ function Disassembler:new(fileOut)
 end
 
 
-function Disassembler:HandleMaths(op, args, reg)
+function Disassembler:HandleMaths(op, args, reg, func)
 	assert(#args == 3)
 	local o = args[1]
 	local a = args[2]
@@ -46,7 +46,7 @@ function Disassembler:HandleMaths(op, args, reg)
 		if t == 'V' then
 			return assert(reg[v])
 		elseif t == 'N' then
-			return "TODO_NUMBER"
+			return assert(func.nums[b])
 		else
 			self:Log("Unknown operation: " .. op)
 			return "INVALID"
@@ -304,7 +304,7 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		op == "MULVV" or op == "MULVN" or op == "MULNV" or
 		op == "DIVVV" or op == "DIVVN" or op == "DIVNV" or
 		op == "MODVV" or op == "MODVN" or op == "MODNV" then
-		self:HandleMaths(op, args, reg)
+		self:HandleMaths(op, args, reg, func)
 
 	elseif op == "POW" then
 		assert(#args == 3)
@@ -388,6 +388,17 @@ function Disassembler:HandleInstruction(line)
 		self:Info("New global (" .. idx .. "): " .. line)
 		return
 
+	elseif pc:sub(1, 3) == "KN " then
+		-- TODO: proper parsing
+		local b,e = assert(line:find("%d+"))
+		local idx = tonumber(line:sub(b, e))
+		line = line:sub(e + 2)
+		local b,e = assert(line:find("%d+"))
+		local num = tonumber(line:sub(b, e))
+		self.currentFunction.nums[idx] = line
+		self:Info("New num (" .. idx .. "): " .. num)
+		return
+
 	elseif pc:find("%d%d%d%d") then
 		pc = tonumber(pc)
 		line = line:sub(6)
@@ -429,7 +440,12 @@ function Disassembler:HandleFunctionBegin(line)
 	local func = {}
 	func.name = "func_" .. self.lineNo
 	func.globals = {}
+	func.nums = {}
 	self:Log("New function: " .. func.name)
+
+	-- For some reason KN 0 isn't dumped
+	-- TODO: time to start parsing the bytecode ourselves
+	func.nums[0] = "UNKNOWN_NUMBER --[[ inspect the lua file for this value ]]"
 
 	self.functions[func.name] = func
 	self.currentFunction = func

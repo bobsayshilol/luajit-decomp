@@ -4,8 +4,8 @@ local_var_1 = 100
 local_cmp_result = input_var_0 >= local_var_1
 if local_cmp_result then goto label_8 end -- 1
 -- loop start
-local_var_1 = TODO_NUMBER * input_var_0
-local_var_0 = local_var_1 + TODO_NUMBER
+local_var_1 = UNKNOWN_NUMBER --[[ inspect the lua file for this value ]] * input_var_0
+local_var_0 = local_var_1 + 1
 if local_cmp_result then goto label_1 end -- 1
 ::label_8::
 return

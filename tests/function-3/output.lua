@@ -7,7 +7,7 @@ return
 end
 
 function func_7(...)
-local_var_0 = TODO_UGET_0 + TODO_NUMBER
+local_var_0 = TODO_UGET_0 + UNKNOWN_NUMBER --[[ inspect the lua file for this value ]]
 TODO_UGET_0 = local_var_0
 return TODO_UGET_0
 end

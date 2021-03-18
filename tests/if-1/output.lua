@@ -1,10 +1,10 @@
 function func_1(...)
-local_var_1 = input_var_0 * TODO_NUMBER
+local_var_1 = input_var_0 * UNKNOWN_NUMBER --[[ inspect the lua file for this value ]]
 local_cmp_result = input_var_0 >= local_var_1
 if local_cmp_result then goto label_5 end -- 1
 local_var_0 = 10
 ::label_5::
-local_var_1 = local_var_0 * TODO_NUMBER
+local_var_1 = local_var_0 * UNKNOWN_NUMBER --[[ inspect the lua file for this value ]]
 local_cmp_result = local_var_0 >= local_var_1
 if local_cmp_result then goto label_9 end -- 1
 local_var_0 = 10

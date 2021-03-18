@@ -1,5 +1,5 @@
 function func_1(...)
-local_var_0 = a + TODO_NUMBER
+local_var_0 = a + UNKNOWN_NUMBER --[[ inspect the lua file for this value ]]
 a = local_var_0
 return
 end

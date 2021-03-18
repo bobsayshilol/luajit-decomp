@@ -7,19 +7,19 @@ function test(a)
 	f0 = a.x ^ a.y
 	g0 = a.x % a.y
 
-	b1 = a.x + 3
+	b1 = a.x + 1
 	c1 = a.x - 3
-	d1 = a.x * 3
-	e1 = a.x / 3
-	f1 = a.x ^ 3
-	g1 = a.x % 3
+	d1 = a.x * 5
+	e1 = a.x / 7
+	f1 = a.x ^ 9
+	g1 = a.x % 11
 
-	b2 = 3 + a.y
-	c2 = 3 - a.y
-	d2 = 3 * a.y
-	e2 = 3 / a.y
-	f2 = 3 ^ a.y
-	g2 = 3 % a.y
+	b2 = 13 + a.y
+	c2 = 15 - a.y
+	d2 = 17 * a.y
+	e2 = 19 / a.y
+	f2 = 21 ^ a.y
+	g2 = 23 % a.y
 
 	a.z = not a.z
 end
