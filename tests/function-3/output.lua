@@ -36,11 +36,11 @@ local_var_4 = local_var_4 + local_var_5
 sink(local_var_2, local_var_3, local_var_4)
 local_var_3 = local_var_0
 local_all_outputs = local_var_3()
-TODO_GLOBAL_2(local_all_outputs) -- TODO 0 0
+sink(local_all_outputs) -- TODO 0 0
 sink(local_all_outputs) -- TODO 1 0
 local_var_3 = local_var_0
 local_all_outputs = local_var_3()
-TODO_GLOBAL_2(local_all_outputs) -- TODO 2 0
+sink(local_all_outputs) -- TODO 2 0
 local_var_3 = local_var_0
 local_all_outputs = local_var_3()
 sink(local_all_outputs) -- TODO 1 1

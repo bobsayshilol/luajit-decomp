@@ -217,7 +217,7 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 
 	elseif op == "CALLM" then
 		assert(#args == 3)
-		local func = assert(func.globals[args[1]])
+		local func = assert(reg[args[1]])
 		self:Write(func .. "(local_all_outputs) -- TODO " .. args[2] .. " " .. args[3])
 
 	elseif op == "CALLMT" then
