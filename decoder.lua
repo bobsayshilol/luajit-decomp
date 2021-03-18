@@ -187,7 +187,7 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		self:Write(reg[i] .. " = " .. v)
 
 
-	elseif op == "CALL" then
+	elseif op == "CALL" or op == "CALLM" then
 		assert(#args == 3)
 
 		local start = args[1]
@@ -196,7 +196,14 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 
 		-- Build up the function call: {"a", "b", "c"} -> a(b, c)
 		local name = assert(reg[start])
-		local params = "(" .. table.concat(reg, ", ", start + 1, start + inputs - 1) .. ")"
+		local params
+		if op == "CALL" then
+			params = "(" .. table.concat(reg, ", ", start + 1, start + inputs - 1) .. ")"
+		elseif inputs > 0 then
+			params = "(" .. table.concat(reg, ", ", start + 1, start + inputs) .. ", local_all_outputs)"
+		else
+			params = "(local_all_outputs)"
+		end
 
 		-- And the return values too
 		local outs = ""
@@ -214,11 +221,6 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		end
 
 		self:Write(outs .. name .. params)
-
-	elseif op == "CALLM" then
-		assert(#args == 3)
-		local func = assert(reg[args[1]])
-		self:Write(func .. "(local_all_outputs) -- TODO " .. args[2] .. " " .. args[3])
 
 	elseif op == "CALLMT" then
 		assert(#args == 2)
