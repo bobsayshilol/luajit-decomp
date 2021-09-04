@@ -62,16 +62,33 @@ end
 
 function Disassembler:HandleIf(op, args, reg, func)
 	assert(#args >= 1)
-	local a = assert(reg[args[1]])
 
 	-- Build the condition
 	local condition
 	if op:sub(3) == "T" then
 		assert(#args == 1)
-		condition = a
+		condition = assert(reg[args[1]])
 	elseif op:sub(3) == "F" then
 		assert(#args == 1)
-		condition = "not " .. a
+		condition = "not " .. assert(reg[args[1]])
+
+	elseif op:sub(3) == "TC" then
+		assert(#args == 2)
+		local o = args[1]
+		local i = assert(reg[args[2]])
+
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = " .. i)
+		condition = reg[o]
+
+	elseif op:sub(3) == "FC" then
+		assert(#args == 2)
+		local o = args[1]
+		local i = assert(reg[args[2]])
+
+		reg[o] = "local_var_" .. o
+		self:Write(reg[o] .. " = " .. i)
+		condition = "not " .. reg[o]
 
 	else
 		-- Determine the type of operation
@@ -95,6 +112,7 @@ function Disassembler:HandleIf(op, args, reg, func)
 
 		-- Handle the 2nd arg
 		assert(#args == 2)
+		local a = assert(reg[args[1]])
 		local b = args[2]
 		if op:sub(3, 3) == "G" or op:sub(3, 3) == "L" then
 			b = assert(reg[b])
