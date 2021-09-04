@@ -191,6 +191,13 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		self:Write(v .. "[" .. n .. "] = " .. i)
 
 
+	elseif op == "TSETM" then
+		assert(#args == 2)
+		local v = assert(reg[args[1] - 1])
+		assert(args[2] == 0)
+		self:Write(v .. " = local_all_outputs")
+
+
 	elseif op == "UGET" then
 		assert(#args == 2)
 		local o = args[1]
@@ -272,10 +279,17 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 
 	elseif op == "TNEW" then
 		assert(#args == 2)
-		assert(args[2] == 0)
 		local o = args[1]
+		local t = args[2]
 		reg[o] = "local_var_" .. o
-		self:Write(reg[o] .. " = {}")
+		if t == 0 then
+			self:Write(reg[o] .. " = {}")
+		elseif t == 3 then
+			self:Write("-- " .. reg[o] .. " = {} -- ???")
+		else
+			self:Log("Unknown type: " .. t)
+			return
+		end
 
 	elseif op == "KPRI" then
 		assert(#args == 2)
@@ -364,6 +378,14 @@ function Disassembler:HandleOp(pc, op, args, comment, isJumpDest)
 		local i = assert(reg[args[2]])
 		reg[o] = "local_var_" .. o
 		self:Write(reg[o] .. " = #" .. i)
+
+
+	elseif op == "VARG" then
+		assert(#args == 3)
+		local o = args[1]
+		assert(args[2] == 0)
+		assert(args[3] == 0)
+		self:Write("local_all_outputs = {...} -- " .. o)
 
 
 	else
