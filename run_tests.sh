@@ -9,6 +9,8 @@ for TEST_NAME in $(ls tests); do
 	input=${TESTS_LOCATION}/${TEST_NAME}/input.lua
 	output=${TESTS_LOCATION}/${TEST_NAME}/output.lua
 
+	luajit -blg ${input} ${TESTS_LOCATION}/${TEST_NAME}/output.asm
+
 	echo
 	echo "Running test '${TEST_NAME}'..."
 
